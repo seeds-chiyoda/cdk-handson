@@ -1,6 +1,8 @@
 *.js
 !jest.config.js
 *.d.ts
+__pycache__/
+*.pyc
 node_modules
 
 # CDK asset staging directory

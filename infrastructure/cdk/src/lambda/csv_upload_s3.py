@@ -1,11 +1,16 @@
 import csv
 import io
 import os
+import random
 
 import boto3
 
 
 def handler(event, context):
+    # Step Functions の失敗系確認用にランダムで例外を発生させる。
+    if random.random() < 0.3:
+        raise RuntimeError("Simulated random failure")
+
     rows = event if isinstance(event, list) else []
     fieldnames = list(rows[0].keys()) if rows and isinstance(rows[0], dict) else []
 

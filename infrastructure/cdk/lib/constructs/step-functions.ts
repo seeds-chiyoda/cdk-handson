@@ -27,6 +27,8 @@ export class JobStateMachine extends Construct {
 
     const failState = new sfn.Fail(this, 'JobFailed');
 
+    firstInvoke.addCatch(failState);
+
     const statusChoice = new sfn.Choice(this, 'StatusIsSuccess')
       .when(sfn.Condition.stringEquals('$.status', 'success'), secondInvoke)
       .otherwise(failState);
