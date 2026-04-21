@@ -1,8 +1,10 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 import { JobScheduleRule } from './constructs/event-bridge';
+import { JobGlue } from './constructs/glue';
 import { JobLambda } from './constructs/lambda';
 import { ResultBucket } from './constructs/s3';
+import { JobQueue } from './constructs/sqs';
 import { JobStateMachine } from './constructs/step-functions';
 
 export class CdkStack extends cdk.Stack {
@@ -18,10 +20,14 @@ export class CdkStack extends cdk.Stack {
       bucket: bucket.bucket,
       handler: 'echo_hello_world.handler',
     });
+    const glue = new JobGlue(this, 'JobGlue');
+    const queue = new JobQueue(this, 'JobQueue');
 
     const jobStateMachine = new JobStateMachine(this, 'JobStateMachine', {
       firstLambdaFunction: firstLambda.function,
-      secondLambdaFunction: secondLambda.function,
+      standardGlueJobName: glue.standardJobName,
+      dedicatedGlueJobName: glue.dedicatedJobName,
+      failureQueue: queue.queue,
     });
 
     new JobScheduleRule(this, 'JobScheduleRule', {
