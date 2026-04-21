@@ -1,19 +1,26 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
+import { JobLambda } from './constructs/lambda';
 import { ResultBucket } from './constructs/s3';
-import { WorkflowLambda } from './constructs/lambda';
-import { WorkflowStateMachine } from './constructs/step-functions';
+import { JobStateMachine } from './constructs/step-functions';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const resultBucket = new ResultBucket(this, 'ResultBucket');
-    const workflowLambda = new WorkflowLambda(this, 'WorkflowLambda', {
-      bucket: resultBucket.bucket,
+    const bucket = new ResultBucket(this, 'ResultBucket');
+    const firstLambda = new JobLambda(this, 'FirstJobLambda', {
+      bucket: bucket.bucket,
+      handler: 'csv_upload_s3.handler',
     });
-    new WorkflowStateMachine(this, 'WorkflowStateMachine', {
-      workflowLambda: workflowLambda.function,
+    const secondLambda = new JobLambda(this, 'SecondJobLambda', {
+      bucket: bucket.bucket,
+      handler: 'echo_hello_world.handler',
+    });
+
+    new JobStateMachine(this, 'JobStateMachine', {
+      firstLambdaFunction: firstLambda.function,
+      secondLambdaFunction: secondLambda.function,
     });
   }
 }
