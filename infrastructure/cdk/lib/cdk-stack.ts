@@ -1,16 +1,19 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { ResultBucket } from './constructs/s3';
+import { WorkflowLambda } from './constructs/lambda';
+import { WorkflowStateMachine } from './constructs/step-functions';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const resultBucket = new ResultBucket(this, 'ResultBucket');
+    const workflowLambda = new WorkflowLambda(this, 'WorkflowLambda', {
+      bucket: resultBucket.bucket,
+    });
+    new WorkflowStateMachine(this, 'WorkflowStateMachine', {
+      workflowLambda: workflowLambda.function,
+    });
   }
 }
