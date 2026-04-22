@@ -29,7 +29,7 @@ export class JobGlue extends Construct {
     dedicatedScriptAsset.grantRead(role);
 
     const standardJob = new glue.CfnJob(this, 'StandardJob', {
-      name: 'standard-adapter-job',
+      name: 'sample-standard-adapter-job',
       role: role.roleArn,
       glueVersion: '4.0',
       command: {
@@ -42,7 +42,7 @@ export class JobGlue extends Construct {
     });
 
     const dedicatedJob = new glue.CfnJob(this, 'DedicatedJob', {
-      name: 'dedicated-adapter-job',
+      name: 'sample-dedicated-adapter-job',
       role: role.roleArn,
       glueVersion: '4.0',
       command: {
